@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Interactiva: Notación Científica - Colegio Montano</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        montanoAzul: '#1269A8',
+                        montanoAmarillo: '#F7D615',
+                        montanoVerdeGris: '#54887D',
+                        montanoAzulClaro: '#88B5C7',
+                        montanoVerdeOliva: '#A6B046',
+                        montanoBlancoSuave: '#F2F5E9',
+                    },
+                    fontFamily: {
+                        sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #334155;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .board-frame {
+            border: 12px solid #F7D615;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            background-color: #1269A8;
+        }
+        .board-canvas {
+            background-color: #F2F5E9;
+            border-radius: 12px;
+            min-height: 600px;
+        }
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            background-color: #1269A8;
+            color: #ffffff;
+            border-bottom: 4px solid #F7D615;
+            font-weight: bold;
+        }
+        .pos-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+        .pos-table th {
+            background-color: #1269A8;
+            color: white;
+            padding: 6px 4px;
+            text-align: center;
+            font-size: 0.75rem;
+        }
+        .pos-table td {
+            border: 1px solid #cbd5e1;
+            padding: 6px 4px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="p-2 md:p-6 flex justify-center items-center min-h-screen">
+
+    <div class="w-full max-w-6xl board-frame p-3 md:p-6 relative text-slate-800" id="mainBoard">
+        
+        <!-- Header Superior / Barra Institucional -->
+        <div class="bg-white rounded-t-xl p-4 mb-3 flex flex-col md:flex-row justify-between items-center shadow-md border-b-4 border-montanoAmarillo gap-4">
+            <div class="flex items-center space-x-4">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyEop0yf6lZ7Jk9MILZxF1rBj4Oqs5esyhIQ&s" 
+                     alt="Colegio Montano" class="h-14 object-contain" onerror="this.src='https://placehold.co/150x50/1269A8/ffffff?text=Colegio+Montano'">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-montanoAzul">Pizarra Digital Interactiva</h1>
+                    <p class="text-xs md:text-sm text-montanoVerdeGris font-semibold">Matemáticas | 6.º de Primaria</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <span class="bg-montanoAzulClaro/30 text-montanoAzul text-xs font-bold px-3 py-1.5 rounded-full border border-montanoAzulClaro">
+                    Tema: Notación Científica
+                </span>
+                <button onclick="toggleFullscreen()" class="bg-montanoAmarillo hover:bg-yellow-400 text-montanoAzul font-bold px-3 py-2 rounded-lg text-sm flex items-center gap-2 shadow transition">
+                    <i class="fa-solid fa-expand"></i> <span class="hidden sm:inline">Pantalla Completa</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Menú de Navegación por Pestañas -->
+        <div class="flex flex-wrap bg-slate-200 rounded-t-lg p-1 gap-1 mb-0 border-b border-slate-300">
+            <button onclick="switchTab('teoria')" id="tab-teoria" class="tab-btn active flex-1 min-w-[120px] py-2 px-3 text-center text-sm md:text-base font-semibold rounded-t-md text-slate-700 hover:bg-slate-300">
+                <i class="fa-solid fa-book-open mr-1"></i> Teoría
+            </button>
+            <button onclick="switchTab('ejemplos')" id="tab-ejemplos" class="tab-btn flex-1 min-w-[120px] py-2 px-3 text-center text-sm md:text-base font-semibold rounded-t-md text-slate-700 hover:bg-slate-300">
+                <i class="fa-solid fa-chalkboard-user mr-1"></i> Ejemplos
+            </button>
+            <button onclick="switchTab('ejercicios')" id="tab-ejercicios" class="tab-btn flex-1 min-w-[120px] py-2 px-3 text-center text-sm md:text-base font-semibold rounded-t-md text-slate-700 hover:bg-slate-300">
+                <i class="fa-solid fa-pen-to-square mr-1"></i> Ejercicios
+            </button>
+            <button onclick="switchTab('reflexion')" id="tab-reflexion" class="tab-btn flex-1 min-w-[120px] py-2 px-3 text-center text-sm md:text-base font-semibold rounded-t-md text-slate-700 hover:bg-slate-300">
+                <i class="fa-solid fa-brain mr-1"></i> Reflexión
+            </button>
+            <button onclick="switchTab('evaluacion')" id="tab-evaluacion" class="tab-btn flex-1 min-w-[120px] py-2 px-3 text-center text-sm md:text-base font-semibold rounded-t-md text-slate-700 hover:bg-slate-300">
+                <i class="fa-solid fa-square-check mr-1"></i> Evaluación
+            </button>
+        </div>
+
+        <!-- Canvas Principal / Contenedor de Contenido -->
+        <div class="board-canvas p-4 md:p-8 shadow-inner overflow-y-auto max-h-[70vh]">
+
+            <!-- ================= PESTAÑA: TEORÍA ================= -->
+            <div id="content-teoria" class="space-y-6">
+                <div class="border-b-2 border-montanoAzul pb-2">
+                    <h2 class="text-2xl font-bold text-montanoAzul flex items-center gap-2">
+                        <i class="fa-solid fa-atom text-montanoAmarillo"></i> Fundamentos de la Notación Científica
+                    </h2>
+                    <p class="text-slate-600">Aprende a abreviar cantidades extremadamente grandes o pequeñas mediante potencias de base 10.</p>
+                </div>
+
+                <!-- 1. Definición y Estructura -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-5 rounded-xl border-l-4 border-montanoAzul shadow-sm">
+                        <h3 class="font-bold text-lg text-montanoAzul mb-2"><i class="fa-solid fa-microscope mr-2"></i> 1. ¿Qué es la Notación Científica?</h3>
+                        <p class="text-xs text-slate-700 leading-relaxed mb-3">
+                            La <strong>notación científica</strong> es una forma abreviada de escribir números muy grandes o muy pequeños expresándolos como el producto de una cifra decimal (coeficiente) por una potencia de 10.
+                        </p>
+                        <div class="text-xs bg-slate-50 p-3 rounded border border-slate-200 space-y-2 text-center">
+                            <p class="font-bold text-montanoAzul text-sm bg-white p-2 rounded border border-montanoAzulClaro">
+                                $$\mathbf{a \times 10^n}$$
+                            </p>
+                            <p>• <strong>$a$ (Coeficiente/Mantisa):</strong> Debe ser un número mayor o igual que $1$ y menor que $10$ ($1 \le a < 10$).</p>
+                            <p>• <strong>$n$ (Exponente):</strong> Es un número entero que representa las posiciones que se mueve el punto decimal.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border-l-4 border-montanoVerdeGris shadow-sm">
+                        <h3 class="font-bold text-lg text-montanoVerdeGris mb-2"><i class="fa-solid fa-compass-drafting mr-2"></i> 2. Reglas para Mover el Punto Decimal</h3>
+                        <p class="text-xs text-slate-700 leading-relaxed mb-3">
+                            El signo del exponente $n$ depende de la dirección hacia la cual mueves el punto decimal:
+                        </p>
+                        <div class="text-xs bg-slate-50 p-3 rounded border border-slate-200 space-y-2">
+                            <div class="p-2 bg-emerald-50 rounded border border-emerald-200">
+                                <span class="font-bold text-emerald-900 block mb-0.5">Números Grandes (Mayores a 10):</span>
+                                Mueves el punto decimal a la <strong>IZQUIERDA</strong> $\rightarrow$ El exponente es <strong>POSITIVO ($+$)</strong>.<br>
+                                <em>Ejemplo:</em> $450,000 = 4.5 \times 10^5$.
+                            </div>
+                            <div class="p-2 bg-indigo-50 rounded border border-indigo-200">
+                                <span class="font-bold text-indigo-900 block mb-0.5">Números Pequeños (Menores a 1):</span>
+                                Mueves el punto decimal a la <strong>DERECHA</strong> $\rightarrow$ El exponente es <strong>NEGATIVO ($-$)</strong>.<br>
+                                <em>Ejemplo:</em> $0.00038 = 3.8 \times 10^{-4}$.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Tabla de Potencias de 10 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-lg text-montanoAzul mb-3"><i class="fa-solid fa-table-list mr-2"></i> 3. Tabla Guía de Potencias de 10 en 6.º de Primaria</h3>
+                    <p class="text-xs text-slate-600 mb-2">Compara cómo las potencias de 10 desplazan el valor de posición:</p>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="pos-table">
+                            <thead>
+                                <tr>
+                                    <th class="bg-montanoAzul">Potencia</th>
+                                    <th>$10^6$</th>
+                                    <th>$10^3$</th>
+                                    <th>$10^2$</th>
+                                    <th>$10^1$</th>
+                                    <th>$10^0$</th>
+                                    <th>$10^{-1}$</th>
+                                    <th>$10^{-2}$</th>
+                                    <th>$10^{-3}$</th>
+                                    <th>$10^{-6}$</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="text-[10px] text-slate-700 font-bold">
+                                    <td class="bg-slate-100">Valor Decimal</td>
+                                    <td>$1,000,000$</td>
+                                    <td>$1,000$</td>
+                                    <td>$100$</td>
+                                    <td>$10$</td>
+                                    <td>$1$</td>
+                                    <td>$0.1$</td>
+                                    <td>$0.01$</td>
+                                    <td>$0.001$</td>
+                                    <td>$0.000001$</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-2 text-[11px] text-slate-700 bg-montanoBlancoSuave p-3 rounded border border-montanoAzulClaro">
+                        <strong>Comprobación de la regla del coeficiente ($1 \le a < 10$):</strong><br>
+                        • Correcto: $\mathbf{3.2 \times 10^4}$ (porque $3.2$ está entre $1$ y $10$).<br>
+                        • Incorrecto: $32 \times 10^3$ (el $32$ es mayor o igual a $10$) o $0.32 \times 10^5$ (el $0.32$ es menor que $1$).
+                    </div>
+                </div>
+
+                <!-- 3. Conceptos Clave -->
+                <div class="bg-white p-5 rounded-xl border-l-4 border-montanoAmarillo shadow-sm">
+                    <h3 class="font-bold text-lg text-slate-800 mb-2"><i class="fa-solid fa-key mr-2"></i> 4. Errores Comunes que Debes Evitar</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                        <div class="p-3 bg-amber-50 rounded-lg border border-amber-300">
+                            <span class="font-bold text-amber-900 text-sm block mb-1">Coeficiente Fuera de Rango</span>
+                            No dejes números mayores de 10 (ej. $15 \times 10^3$) ni menores a 1 (ej. $0.5 \times 10^2$). Ajusta el punto decimal.
+                        </div>
+                        <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-300">
+                            <span class="font-bold text-emerald-900 text-sm block mb-1">Conteo de Ceros vs. Lugares</span>
+                            El exponente indica cuántos <strong>lugares o posiciones</strong> se mueve el punto decimal, no siempre la cantidad de ceros.
+                        </div>
+                        <div class="p-3 bg-indigo-50 rounded-lg border border-indigo-300">
+                            <span class="font-bold text-indigo-900 text-sm block mb-1">Signo del Exponente</span>
+                            Recuerda: Si el número original es gigante ($>10$), el exponente es $+$. Si es un decimal diminuto ($<1$), el exponente es $-$.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= PESTAÑA: EJEMPLOS ================= -->
+            <div id="content-ejemplos" class="hidden space-y-6">
+                <div class="border-b-2 border-montanoAzul pb-2">
+                    <h2 class="text-2xl font-bold text-montanoAzul">Ejemplos Resueltos Paso a Paso</h2>
+                    <p class="text-slate-600">Revisa la conversión detallada entre notación estándar y notación científica en 3 niveles de complejidad.</p>
+                </div>
+
+                <!-- Bloque Nivel Básico -->
+                <div class="space-y-3">
+                    <span class="bg-montanoVerdeOliva text-white text-xs font-bold px-3 py-1 rounded-full inline-block">NIVEL BÁSICO (5 Ejemplos)</span>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <p class="font-semibold text-slate-800 text-sm">1. Convertir número entero grande: Escribe $5,000$ en notación científica.</p>
+                        <p class="text-xs text-slate-600 mt-1"><strong>Solución:</strong><br>• El punto decimal al final se mueve $3$ posiciones a la izquierda hasta quedar entre $5$ y $0$: $5.0$.<br>• Como fue a la izquierda, el exponente es $+3$.<br>Resultado: $\mathbf{5 \times 10^3}$.</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <p class="font-semibold text-slate-800 text-sm">2. Convertir decimal diminuto: Escribe $0.007$ en notación científica.</p>
+                        <p class="text-xs text-slate-600 mt-1"><strong>Solución:</strong><br>• El punto decimal se desplaza $3$ posiciones a la derecha hasta colocarlo tras el $7$.<br>• Como el movimiento fue a la derecha, el exponente es $-3$.<br>Resultado: $\mathbf{7 \times 10^{-3}}$.</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <p class="font-semibold text-slate-800 text-sm">3. Pasar a forma estándar (exponente positivo): Convierte $4.2 \times 10^4$ a número común.</p>
+                        <p class="text-xs text-slate-600 mt-1"><strong>Solución:</strong><br>• Exponente $+4$ indica mover el punto decimal $4$ posiciones a la derecha.<br>• $4.2 \rightarrow 42 \rightarrow 420 \rightarrow 4200 \rightarrow 42000$.<br>Resultado: $\mathbf{42,000}$.</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <p class="font-semibold text-slate-800 text-sm">4. Pasar a forma estándar (exponente negativo): Convierte $6.1 \times 10^{-2}$ a número común.</p>
+                        <p class="text-xs text-slate-600 mt-1"><strong>Solución:</strong><br>• Exponente $-2$ indica desplazar el punto $2$ lugares hacia la izquierda.<br>• $6.1 \rightarrow 0.61 \rightarrow 0.061$.<br>Resultado: $\mathbf{0.061}$.</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <p class="font-semibold text-slate-800 text-sm">5. Identificar expresión válida: ¿Es $12 \times 10^3$ una expresión correcta en notación científica?</p>
+                        <p class="text-xs text-slate-600 mt-1"><strong>Solución:</strong> No es correcta porque el coeficiente $12$ no cumple la condición $1 \le a < 10$. La forma correcta es $\mathbf{1.2 \times 10^4}$.</p>
+                    </div>
+                </div>
+
+                <!-- Bloque Nivel Intermedio -->
+                <div class="space-y-3 pt-2">
+                    <span class="bg-montanoAzul text-white text-xs font-bold px-3 py-1 rounded-full inline-block">NIVEL INTERMEDIO (5 Ejemplos)</span>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <p class="font-semibold text-slate-800 text-sm">1. Convertir número de varios dígitos: Expresa $384,000,000$ en notación científica.</p>
+                        <p class="text-xs text-slate-600 mt-1"><strong>Solución:</strong><br>• Movemos el punto $8$ posiciones a la izquierda hasta $3.84$.<br>• Exponente $+8$.<br>Resultado: $\mathbf{3.84 \times 10^8}$.</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <p class="font-semibold text-slate-800 text-sm">2. Convertir decimal con varios ceros: Expresa $0.0000592$ en notación científica.</p>
+                        <p class="text-xs text-slate-600 mt-1"><strong>Solución:</strong><br>• Desplazamos el punto $5$ lugares a la derecha hasta colocarlo tras el $5$ ($5.92$).<br>• Exponente $-5$.<br>Resultado: $\mathbf{5.92 \times 10^{-5}}$.</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <p class="font-semibold text-slate-800 text-sm">3. Ajustar coeficiente incorrecto: Corrige la expresión $0.045 \times 10^6$ para que quede en notación científica válida.</p>
+                        <p class="text-xs text-slate-600 mt-1"><strong>Solución:</strong><br>• Para convertir $0.045$ en $4.5$, movemos el punto $2$ posiciones a la derecha ($10^{-2}$).<br>• Combinamos exponentes: $10^{-2} \times 10^6 = 10^{6-2} = 10^4$.<br>Resultado: $\mathbf{4.5 \times 10^4}$.</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <p class="font-semibold text-slate-800 text-sm">4. Comparación de magnitudes: Compara $X = 7.3 \times 10^5$ e $Y = 1.9 \times 10^6$. ¿Cuál es mayor?</p>
+                        <p class="text-xs text-slate-600 mt-1"><strong>Solución:</strong><br>• Primero comparamos los exponentes: $10^6 > 10^5$.<br>• $X = 730,000$ e $Y = 1,900,000$.<br>Resultado: $\mathbf{Y > X}$ ($1.9 \times 10^6 > 7.3 \times 10^5$).</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <p class="font-semibold text-slate-800 text-sm">5. Multiplicación simple en notación científica: Calcula $(2 \times 10^3) \times (3 \times 10^4)$.</p>
+                        <p class="text-xs text-slate-600 mt-1"><strong>Solución:</strong><br>• Multiplicamos los coeficientes: $2 \times 3 = 6$.<br>• Sumamos los exponentes de las potencias de 10: $3 + 4 = 7$.<br>Resultado: $\mathbf{6 \times 10^7}$.</p>
+                    </div>
+                </div>
+
+                <!-- Bloque Nivel Avanzado -->
+                <div class="space-y-3 pt-2">
+                    <span class="bg-montanoVerdeGris text-white text-xs font-bold px-3 py-1 rounded-full inline-block">NIVEL AVANZADO (5 Ejemplos)</span>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <p class="font-semibold text-slate-800 text-sm">1. Problema de Astronomía: La luz viaja a $3 \times 10^8$ m/s. Si tarda $5 \times 10^2$ segundos en llegar del Sol a la Tierra, calcula la distancia en metros en notación científica.</p>
+                        <p class="text-xs text-slate-600 mt-1"><strong>Solución:</strong><br>• $\text{Distancia} = \text{Velocidad} \times \text{Tiempo} = (3 \times 10^8) \times (5 \times 10^2)$.<br>• Coeficientes: $3 \times 5 = 15$. Potencias: $10^{8+2} = 10^{10} \rightarrow 15 \times 10^{10}$.<br>• Ajustando a notación científica válida ($1 \le a < 10$): $1.5 \times 10^{11}$ metros.<br>Resultado: $\mathbf{1.5 \times 10^{11} \text{ m}}$.</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <p class="font-semibold text-slate-800 text-sm">2. División en notación científica: Un depósito de agua contiene $8.4 \times 10^6$ litros de agua. Si se distribuye equitativamente entre $2.1 \times 10^3$ familias, ¿cuántos litros recibe cada familia?</p>
+                        <p class="text-xs text-slate-600 mt-1"><strong>Solución:</strong><br>• Divisón: $(8.4 \times 10^6) \div (2.1 \times 10^3)$.<br>• Coeficientes: $8.4 \div 2.1 = 4$. Exponentes: $10^{6-3} = 10^3$.<br>Resultado: $\mathbf{4 \times 10^3 \text{ litros}}$ ($4,000 \text{ litros}$).</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <p class="font-semibold text-slate-800 text-sm">3. Operaciones combinadas con reajuste: Calcula $(4 \times 10^{-4}) \times (5 \times 10^{-3})$ y expresa el resultado en notación científica.</p>
+                        <p class="text-xs text-slate-600 mt-1"><strong>Solución:</strong><br>• Coeficientes: $4 \times 5 = 20$. Potencias: $10^{(-4) + (-3)} = 10^{-7} \rightarrow 20 \times 10^{-7}$.<br>• Reajustamos $20 = 2.0 \times 10^1$: $(2.0 \times 10^1) \times 10^{-7} = 2.0 \times 10^{1-7} = 2.0 \times 10^{-6}$.<br>Resultado: $\mathbf{2 \times 10^{-6}}$.</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <p class="font-semibold text-slate-800 text-sm">4. Suma con exponentes iguales: Calcula $(3.5 \times 10^4) + (2.3 \times 10^4)$.</p>
+                        <p class="text-xs text-slate-600 mt-1"><strong>Solución:</strong><br>• Como ambas potencias son iguales ($10^4$), sumamos directamente los coeficientes:<br>• $(3.5 + 2.3) \times 10^4 = 5.8 \times 10^4$.<br>Resultado: $\mathbf{5.8 \times 10^4}$ ($58,000$).</p>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                        <p class="font-semibold text-slate-800 text-sm">5. Suma con exponentes distintos: Suma $(5.2 \times 10^5) + (3 \times 10^4)$.</p>
+                        <p class="text-xs text-slate-600 mt-1"><strong>Solución:</strong><br>• Convertimos al exponente mayor ($10^5$): $3 \times 10^4 = 0.3 \times 10^5$.<br>• Sumamos coeficientes: $(5.2 + 0.3) \times 10^5 = 5.5 \times 10^5$.<br>• Verificación estándar: $520,000 + 30,000 = 550,000 = 5.5 \times 10^5$.<br>Resultado: $\mathbf{5.5 \times 10^5}$.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= PESTAÑA: EJERCICIOS ================= -->
+            <div id="content-ejercicios" class="hidden space-y-6">
+                <div class="border-b-2 border-montanoAzul pb-2">
+                    <h2 class="text-2xl font-bold text-montanoAzul">Ejercicios Prácticos para Resolver</h2>
+                    <p class="text-slate-600">Copia y resuelve los problemas en tu cuaderno. Luego presiona el botón interactivo para verificar tu desarrollo.</p>
+                </div>
+
+                <!-- BÁSICO -->
+                <div class="space-y-4">
+                    <h3 class="font-bold text-montanoVerdeOliva border-b pb-1 text-sm uppercase">Nivel Básico (5 Ejercicios)</h3>
+                    
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="font-semibold text-slate-800 text-sm">1. Escribe la distancia aproximada de la Tierra a la Luna ($384,000\text{ km}$) en notación científica.</p>
+                        <button onclick="toggleSolution('ex-b1')" class="mt-2 text-xs bg-montanoAzulClaro/30 text-montanoAzul font-bold px-3 py-1.5 rounded hover:bg-montanoAzul hover:text-white transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar / Ocultar Solución
+                        </button>
+                        <div id="ex-b1" class="hidden mt-3 p-3 bg-montanoBlancoSuave border-l-4 border-montanoAzul text-xs text-slate-700">
+                            <strong>Respuesta:</strong> $\mathbf{3.84 \times 10^5\text{ km}}$. Se mueve el punto $5$ lugares a la izquierda.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="font-semibold text-slate-800 text-sm">2. Expresa $0.00009$ en notación científica.</p>
+                        <button onclick="toggleSolution('ex-b2')" class="mt-2 text-xs bg-montanoAzulClaro/30 text-montanoAzul font-bold px-3 py-1.5 rounded hover:bg-montanoAzul hover:text-white transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar / Ocultar Solución
+                        </button>
+                        <div id="ex-b2" class="hidden mt-3 p-3 bg-montanoBlancoSuave border-l-4 border-montanoAzul text-xs text-slate-700">
+                            <strong>Respuesta:</strong> $\mathbf{9 \times 10^{-5}}$. Se desplaza el punto $5$ posiciones a la derecha.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="font-semibold text-slate-800 text-sm">3. Transforma $7.5 \times 10^3$ a número común o estándar.</p>
+                        <button onclick="toggleSolution('ex-b3')" class="mt-2 text-xs bg-montanoAzulClaro/30 text-montanoAzul font-bold px-3 py-1.5 rounded hover:bg-montanoAzul hover:text-white transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar / Ocultar Solución
+                        </button>
+                        <div id="ex-b3" class="hidden mt-3 p-3 bg-montanoBlancoSuave border-l-4 border-montanoAzul text-xs text-slate-700">
+                            <strong>Respuesta:</strong> $\mathbf{7,500}$. Se corre el punto $3$ posiciones a la derecha.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="font-semibold text-slate-800 text-sm">4. Transforma $2.8 \times 10^{-4}$ a número común decimal.</p>
+                        <button onclick="toggleSolution('ex-b4')" class="mt-2 text-xs bg-montanoAzulClaro/30 text-montanoAzul font-bold px-3 py-1.5 rounded hover:bg-montanoAzul hover:text-white transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar / Ocultar Solución
+                        </button>
+                        <div id="ex-b4" class="hidden mt-3 p-3 bg-montanoBlancoSuave border-l-4 border-montanoAzul text-xs text-slate-700">
+                            <strong>Respuesta:</strong> $\mathbf{0.00028}$. Se desplaza el punto $4$ lugares a la izquierda.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="font-semibold text-slate-800 text-sm">5. Selecciona la opción que representa una notación científica válida: A) $0.4 \times 10^5$, B) $4 \times 10^5$, C) $40 \times 10^4$.</p>
+                        <button onclick="toggleSolution('ex-b5')" class="mt-2 text-xs bg-montanoAzulClaro/30 text-montanoAzul font-bold px-3 py-1.5 rounded hover:bg-montanoAzul hover:text-white transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar / Ocultar Solución
+                        </button>
+                        <div id="ex-b5" class="hidden mt-3 p-3 bg-montanoBlancoSuave border-l-4 border-montanoAzul text-xs text-slate-700">
+                            <strong>Respuesta: B) $4 \times 10^5$.</strong> Es la única donde el coeficiente cumple $1 \le a < 10$.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INTERMEDIO -->
+                <div class="space-y-4 pt-4">
+                    <h3 class="font-bold text-montanoAzul border-b pb-1 text-sm uppercase">Nivel Intermedio (5 Ejercicios)</h3>
+                    
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="font-semibold text-slate-800 text-sm">6. La velocidad de la luz es aproximadamente $300,000,000\text{ m/s}$. Escríbela en notación científica.</p>
+                        <button onclick="toggleSolution('ex-i1')" class="mt-2 text-xs bg-montanoAzulClaro/30 text-montanoAzul font-bold px-3 py-1.5 rounded hover:bg-montanoAzul hover:text-white transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar / Ocultar Solución
+                        </button>
+                        <div id="ex-i1" class="hidden mt-3 p-3 bg-montanoBlancoSuave border-l-4 border-montanoAzul text-xs text-slate-700">
+                            <strong>Respuesta:</strong> $\mathbf{3 \times 10^8\text{ m/s}}$.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="font-semibold text-slate-800 text-sm">7. El tamaño de una bacteria es de $0.0000025\text{ metros}$. Expresa este tamaño en notación científica.</p>
+                        <button onclick="toggleSolution('ex-i2')" class="mt-2 text-xs bg-montanoAzulClaro/30 text-montanoAzul font-bold px-3 py-1.5 rounded hover:bg-montanoAzul hover:text-white transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar / Ocultar Solución
+                        </button>
+                        <div id="ex-i2" class="hidden mt-3 p-3 bg-montanoBlancoSuave border-l-4 border-montanoAzul text-xs text-slate-700">
+                            <strong>Respuesta:</strong> $\mathbf{2.5 \times 10^{-6}\text{ m}}$.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="font-semibold text-slate-800 text-sm">8. Corrige la siguiente expresión incorrecta: $65 \times 10^4$.</p>
+                        <button onclick="toggleSolution('ex-i3')" class="mt-2 text-xs bg-montanoAzulClaro/30 text-montanoAzul font-bold px-3 py-1.5 rounded hover:bg-montanoAzul hover:text-white transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar / Ocultar Solución
+                        </button>
+                        <div id="ex-i3" class="hidden mt-3 p-3 bg-montanoBlancoSuave border-l-4 border-montanoAzul text-xs text-slate-700">
+                            $65 = 6.5 \times 10^1 \Rightarrow (6.5 \times 10^1) \times 10^4 = 6.5 \times 10^5$.<br>
+                            <strong>Respuesta:</strong> $\mathbf{6.5 \times 10^5}$.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="font-semibold text-slate-800 text-sm">9. Compara y determina cuál número es menor: $A = 8.1 \times 10^{-3}$ o $B = 2.4 \times 10^{-2}$.</p>
+                        <button onclick="toggleSolution('ex-i4')" class="mt-2 text-xs bg-montanoAzulClaro/30 text-montanoAzul font-bold px-3 py-1.5 rounded hover:bg-montanoAzul hover:text-white transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar / Ocultar Solución
+                        </button>
+                        <div id="ex-i4" class="hidden mt-3 p-3 bg-montanoBlancoSuave border-l-4 border-montanoAzul text-xs text-slate-700">
+                            $A = 0.0081$, $B = 0.024$. Comparando potencias: $-3 < -2$, por lo que $A$ está más lejos de 1.<br>
+                            <strong>Respuesta:</strong> **A es menor que B** ($8.1 \times 10^{-3} < 2.4 \times 10^{-2}$).
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="font-semibold text-slate-800 text-sm">10. Resuelve el producto: $(3 \times 10^5) \times (2.5 \times 10^2)$.</p>
+                        <button onclick="toggleSolution('ex-i5')" class="mt-2 text-xs bg-montanoAzulClaro/30 text-montanoAzul font-bold px-3 py-1.5 rounded hover:bg-montanoAzul hover:text-white transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar / Ocultar Solución
+                        </button>
+                        <div id="ex-i5" class="hidden mt-3 p-3 bg-montanoBlancoSuave border-l-4 border-montanoAzul text-xs text-slate-700">
+                            Coeficientes: $3 \times 2.5 = 7.5$. Exponentes: $5 + 2 = 7$.<br>
+                            <strong>Respuesta:</strong> $\mathbf{7.5 \times 10^7}$.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AVANZADO -->
+                <div class="space-y-4 pt-4">
+                    <h3 class="font-bold text-montanoVerdeGris border-b pb-1 text-sm uppercase">Nivel Avanzado (5 Ejercicios)</h3>
+                    
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="font-semibold text-slate-800 text-sm">11. Si una supercomputadora realiza $4 \times 10^{12}$ operaciones por segundo, ¿cuántas operaciones realizará en $2 \times 10^2$ segundos? Expresa en notación científica.</p>
+                        <button onclick="toggleSolution('ex-a1')" class="mt-2 text-xs bg-montanoAzulClaro/30 text-montanoAzul font-bold px-3 py-1.5 rounded hover:bg-montanoAzul hover:text-white transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar / Ocultar Solución
+                        </button>
+                        <div id="ex-a1" class="hidden mt-3 p-3 bg-montanoBlancoSuave border-l-4 border-montanoAzul text-xs text-slate-700">
+                            $(4 \times 10^{12}) \times (2 \times 10^2) = (4 \times 2) \times 10^{12+2} = \mathbf{8 \times 10^{14}\text{ operaciones}}$.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="font-semibold text-slate-800 text-sm">12. Divide $(9.6 \times 10^8) \div (3.2 \times 10^3)$ y expresa el resultado en notación científica.</p>
+                        <button onclick="toggleSolution('ex-a2')" class="mt-2 text-xs bg-montanoAzulClaro/30 text-montanoAzul font-bold px-3 py-1.5 rounded hover:bg-montanoAzul hover:text-white transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar / Ocultar Solución
+                        </button>
+                        <div id="ex-a2" class="hidden mt-3 p-3 bg-montanoBlancoSuave border-l-4 border-montanoAzul text-xs text-slate-700">
+                            Coeficientes: $9.6 \div 3.2 = 3$. Exponentes: $10^{8-3} = 10^5$.<br>
+                            <strong>Respuesta:</strong> $\mathbf{3 \times 10^5}$.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="font-semibold text-slate-800 text-sm">13. Resuelve $(5 \times 10^4) \times (6 \times 10^3)$ y reajusta la respuesta a notación científica estándar.</p>
+                        <button onclick="toggleSolution('ex-a3')" class="mt-2 text-xs bg-montanoAzulClaro/30 text-montanoAzul font-bold px-3 py-1.5 rounded hover:bg-montanoAzul hover:text-white transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar / Ocultar Solución
+                        </button>
+                        <div id="ex-a3" class="hidden mt-3 p-3 bg-montanoBlancoSuave border-l-4 border-montanoAzul text-xs text-slate-700">
+                            $(5 \times 6) \times 10^{4+3} = 30 \times 10^7$.<br>
+                            Reajustando $30 = 3.0 \times 10^1$: $(3.0 \times 10^1) \times 10^7 = \mathbf{3 \times 10^8}$.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="font-semibold text-slate-800 text-sm">14. Un glóbulo rojo mide aproximadamente $7 \times 10^{-6}\text{ m}$. Si colocamos $1 \times 10^6$ glóbulos rojos en fila india, ¿qué longitud total en metros alcanzarían?</p>
+                        <button onclick="toggleSolution('ex-a4')" class="mt-2 text-xs bg-montanoAzulClaro/30 text-montanoAzul font-bold px-3 py-1.5 rounded hover:bg-montanoAzul hover:text-white transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar / Ocultar Solución
+                        </button>
+                        <div id="ex-a4" class="hidden mt-3 p-3 bg-montanoBlancoSuave border-l-4 border-montanoAzul text-xs text-slate-700">
+                            $(7 \times 10^{-6}) \times (1 \times 10^6) = 7 \times 10^{-6+6} = 7 \times 10^0 = \mathbf{7\text{ metros}}$.
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="font-semibold text-slate-800 text-sm">15. Halla la suma $(4.1 \times 10^6) + (8 \times 10^5)$ y exprésala en notación científica.</p>
+                        <button onclick="toggleSolution('ex-a5')" class="mt-2 text-xs bg-montanoAzulClaro/30 text-montanoAzul font-bold px-3 py-1.5 rounded hover:bg-montanoAzul hover:text-white transition">
+                            <i class="fa-solid fa-eye"></i> Mostrar / Ocultar Solución
+                        </button>
+                        <div id="ex-a5" class="hidden mt-3 p-3 bg-montanoBlancoSuave border-l-4 border-montanoAzul text-xs text-slate-700">
+                            Convertimos $8 \times 10^5$ a exponente $10^6 \rightarrow 0.8 \times 10^6$.<br>
+                            Sumamos coeficientes: $(4.1 + 0.8) \times 10^6 = \mathbf{4.9 \times 10^6}$ ($4,900,000$).
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= PESTAÑA: REFLEXIÓN ================= -->
+            <div id="content-reflexion" class="hidden space-y-6">
+                <div class="border-b-2 border-montanoAzul pb-2">
+                    <h2 class="text-2xl font-bold text-montanoAzul">Preguntas de Reflexión Crítica</h2>
+                    <p class="text-slate-600">Razona sobre la relevancia de la notación científica en las ciencias, la tecnología y el universo.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-5 rounded-xl border-t-4 border-montanoAzul shadow-sm">
+                        <div class="text-montanoAzul font-bold text-lg mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-rocket"></i> 1. Del Microcosmos al Macrocosmos
+                        </div>
+                        <p class="text-sm text-slate-700 leading-relaxed">
+                            ¿Por qué los astrónomos (que estudian galaxias) y los microbiólogos (que estudian virus) utilizan exactamente el mismo método de notación científica para sus mediciones?
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border-t-4 border-montanoVerdeGris shadow-sm">
+                        <div class="text-montanoVerdeGris font-bold text-lg mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-calculator"></i> 2. Eficiencia y Errores
+                        </div>
+                        <p class="text-sm text-slate-700 leading-relaxed">
+                            Escribir $0.00000000000000000000000000167\text{ kg}$ facilita cometer errores al omitir o agregar ceros. ¿De qué manera la notación científica nos protege contra los errores humanos en experimentos importantes?
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border-t-4 border-montanoAmarillo shadow-sm">
+                        <div class="text-slate-800 font-bold text-lg mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-mobile-screen-button"></i> 3. Calculadoras y Tecnología
+                        </div>
+                        <p class="text-sm text-slate-700 leading-relaxed">
+                            Cuando ingresas un número muy largo en la calculadora de un teléfono celular, a veces aparece la letra "E" (por ejemplo, `5.2E8`). ¿Cómo se conecta esa "E" con el concepto de multiplicaciones por potencias de 10?
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border-t-4 border-montanoVerdeOliva shadow-sm">
+                        <div class="text-montanoVerdeOliva font-bold text-lg mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-lightbulb"></i> 4. La Regla del Coeficiente
+                        </div>
+                        <p class="text-sm text-slate-700 leading-relaxed">
+                            ¿Por qué la comunidad científica mundial acordó que el coeficiente $a$ deba ser un número estrictamente entre $1$ y $10$ ($1 \le a < 10$) en lugar de permitir números como $35 \times 10^4$?
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= PESTAÑA: EVALUACIÓN ================= -->
+            <div id="content-evaluacion" class="hidden space-y-6">
+                <div class="border-b-2 border-montanoAzul pb-2">
+                    <h2 class="text-2xl font-bold text-montanoAzul">Evaluación Formativa Interactiva</h2>
+                    <p class="text-slate-600">Demuestra tus competencias en el manejo de la notación científica.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="font-bold text-montanoAzul text-base">Comprobación Rápida de Competencias</h3>
+                    
+                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <p class="text-sm font-semibold text-slate-800">1. ¿Cuál es la notación científica correcta para la masa de la Tierra aproximadamente ($5,970,000,000,000,000,000,000,000\text{ kg}$)?</p>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="toggleSolution('sol-ev1')" class="text-xs bg-montanoAzul text-white px-3 py-1.5 rounded hover:bg-montanoAzul/80">Ver Respuesta y Explicación</button>
+                        </div>
+                        <div id="sol-ev1" class="hidden mt-2 p-2 bg-emerald-50 text-emerald-900 text-xs rounded border border-emerald-200">
+                            <strong>Respuesta: $5.97 \times 10^{24}\text{ kg}$.</strong><br>
+                            Se mueve el punto decimal $24$ lugares hacia la izquierda.
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <p class="text-sm font-semibold text-slate-800">2. Si conviertes $4.05 \times 10^{-5}$ a forma estándar decimal, ¿cuántos ceros habrá en total antes del número $4$?</p>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="toggleSolution('sol-ev2')" class="text-xs bg-montanoAzul text-white px-3 py-1.5 rounded hover:bg-montanoAzul/80">Ver Respuesta y Explicación</button>
+                        </div>
+                        <div id="sol-ev2" class="hidden mt-2 p-2 bg-emerald-50 text-emerald-900 text-xs rounded border border-emerald-200">
+                            <strong>Respuesta: 5 ceros ($0.0000405$).</strong><br>
+                            El primer cero está antes del punto decimal y $4$ ceros después del punto.
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <p class="text-sm font-semibold text-slate-800">3. Resuelve el producto $(2 \times 10^{-3}) \times (4 \times 10^{-2})$ en notación científica.</p>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="toggleSolution('sol-ev3')" class="text-xs bg-montanoAzul text-white px-3 py-1.5 rounded hover:bg-montanoAzul/80">Ver Respuesta y Explicación</button>
+                        </div>
+                        <div id="sol-ev3" class="hidden mt-2 p-2 bg-emerald-50 text-emerald-900 text-xs rounded border border-emerald-200">
+                            <strong>Respuesta: $8 \times 10^{-5}$.</strong><br>
+                            $(2 \times 4) = 8$ y potencias $10^{(-3) + (-2)} = 10^{-5}$.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer / Pie de Pizarra -->
+        <div class="mt-3 text-center text-xs text-white/80 font-semibold">
+            Colegio Montano &copy; Guías de Estudio Interactivas | Diseñado para Canvas Education
+        </div>
+    </div>
+
+    <script>
+        // Función para cambiar de pestaña y re-renderizar expresiones MathJax
+        function switchTab(tabName) {
+            const contents = ['teoria', 'ejemplos', 'ejercicios', 'reflexion', 'evaluacion'];
+            contents.forEach(id => {
+                const el = document.getElementById('content-' + id);
+                if (el) el.classList.add('hidden');
+                
+                const btn = document.getElementById('tab-' + id);
+                if (btn) btn.classList.remove('active');
+            });
+
+            const selectedContent = document.getElementById('content-' + tabName);
+            if (selectedContent) selectedContent.classList.remove('hidden');
+
+            const selectedBtn = document.getElementById('tab-' + tabName);
+            if (selectedBtn) selectedBtn.classList.add('active');
+
+            // Renderizar MathJax si está activo para asegurar ecuaciones impecables
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise();
+            }
+        }
+
+        // Función para alternar visibilidad de respuestas ocultas
+        function toggleSolution(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.toggle('hidden');
+                if (!el.classList.contains('hidden') && window.MathJax && window.MathJax.typesetPromise) {
+                    window.MathJax.typesetPromise([el]);
+                }
+            }
+        }
+
+        // Función de pantalla completa
+        function toggleFullscreen() {
+            const elem = document.getElementById('mainBoard');
+            if (!document.fullscreenElement) {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) { /* Safari */
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) { /* IE11 */
+                    elem.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
